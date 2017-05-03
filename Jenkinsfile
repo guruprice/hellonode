@@ -10,7 +10,9 @@ node {
     stage('Build image') {
         /* This builds the actual image; synonymous to
          * docker build on the command line */
-        app = sh 'sudo docker build -t guruprice/hellonode .'
+        sh 'sudo docker build -t guruprice/hellonode .'
+        app = docker.build("guruprice/hellonode")
+        echo app
     }
 
     stage('Test image') {
@@ -27,9 +29,10 @@ node {
          * First, the incremental build number from Jenkins
          * Second, the 'latest' tag.
          * Pushing multiple tags is cheap, as all the layers are reused. */
-        docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
+        docker.withRegistry('https://1234567890.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:demo-ecr-credentials') {
+        docker.image('guruprice/hellonode').push('latest')
+        app.push("${env.BUILD_NUMBER}")
+        app.push("latest")
         }
     }
 }
